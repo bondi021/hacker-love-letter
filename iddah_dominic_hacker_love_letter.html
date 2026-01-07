@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SECURE LOVE PROTOCOL</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+* { box-sizing: border-box; }
+body {
+    margin: 0;
+    background: black;
+    color: #00ff9c;
+    font-family: "Courier New", monospace;
+    height: 100vh;
+    overflow: hidden;
+}
+canvas {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+}
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: black;
+    color: #00ff9c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    z-index: 5;
+}
+button {
+    background: black;
+    color: #00ff9c;
+    border: 1px solid #00ff9c;
+    padding: 12px 20px;
+    cursor: pointer;
+    font-family: inherit;
+    margin-top: 20px;
+}
+button:hover {
+    background: #00ff9c;
+    color: black;
+}
+.terminal {
+    position: relative;
+    z-index: 2;
+    max-width: 900px;
+    margin: 60px auto;
+    padding: 35px;
+    border: 1px solid #00ff9c;
+    box-shadow: 0 0 30px #00ff9c;
+    background: rgba(0, 0, 0, 0.9);
+}
+.line {
+    margin: 8px 0;
+    white-space: pre-wrap;
+}
+.cursor {
+    display: inline-block;
+    width: 10px;
+    background: #00ff9c;
+    animation: blink 1s infinite;
+}
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+}
+.glitch {
+    animation: glitch 1s infinite;
+}
+@keyframes glitch {
+    0% { text-shadow: 2px 0 red; }
+    50% { text-shadow: -2px 0 cyan; }
+    100% { text-shadow: 2px 0 red; }
+}
+.hidden { display: none; }
+.countdown {
+    color: red;
+    font-size: 20px;
+    margin-top: 15px;
+}
+</style>
+</head>
+<body>
+
+<canvas id="matrix"></canvas>
+
+<audio id="hackSound" loop>
+  <source src="https://assets.mixkit.co/sfx/preview/mixkit-computer-typing-1156.mp3" type="audio/mpeg">
+</audio>
+
+<div class="overlay" id="lock">
+    <div class="glitch">SECURE SERVER</div>
+    <div>> ENTER PASSWORD</div>
+    <input id="pass" style="background:black;color:#00ff9c;border:1px solid #00ff9c;padding:8px;margin-top:10px;">
+    <button onclick="unlock()">ACCESS</button>
+    <div id="error" style="color:red;margin-top:10px;"></div>
+</div>
+
+<div class="terminal hidden" id="terminal">
+    <div class="countdown" id="countdown"></div>
+</div>
+
+<script>
+const PASSWORD = "love";
+
+/* MATRIX */
+const canvas = document.getElementById("matrix");
+const ctx = canvas.getContext("2d");
+function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener("resize", resize);
+
+const chars = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ@#$%&";
+const size = 16;
+let columns, drops;
+function initMatrix() {
+    columns = Math.floor(canvas.width / size);
+    drops = Array(columns).fill(1);
+}
+initMatrix();
+
+function drawMatrix() {
+    ctx.fillStyle = "rgba(0,0,0,0.05)";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle = "#00ff9c";
+    ctx.font = size+"px Courier New";
+    for(let i=0;i<drops.length;i++){
+        const text = chars[Math.floor(Math.random()*chars.length)];
+        ctx.fillText(text,i*size,drops[i]*size);
+        if(drops[i]*size>canvas.height && Math.random()>0.975) drops[i]=0;
+        drops[i]++;
+    }
+}
+setInterval(drawMatrix,33);
+
+/* TERMINAL MESSAGE */
+const lines = [
+"> Establishing encrypted tunnel...",
+"> Verifying recipient: IDDAH",
+"> Authorizing sender: DOMINIC",
+"> ACCESS GRANTED",
+"",
+"> SYSTEM OVERRIDE: HEART DEFENSES DISABLED",
+"",
+"Iddah,",
+"In this world of endless code and chaos,",
+"you are the only constant my system trusts.",
+"",
+"You crash my logic and rewrite my future.",
+"No firewall could ever keep you out.",
+"",
+"If this system self-destructs,",
+"know this truth survives every reboot:",
+"",
+"I choose you. Always.",
+"",
+"- Dominic",
+"",
+"❤️ END OF TRANSMISSION ❤️"
+];
+
+let index = 0;
+function typeLine() {
+    if(index >= lines.length) return;
+    const div = document.createElement("div");
+    div.className = "line";
+    document.getElementById("terminal").appendChild(div);
+    let i = 0;
+    const interval = setInterval(()=>{
+        div.textContent = lines[index].slice(0,i++);
+        if(i > lines[index].length){
+            clearInterval(interval);
+            index++;
+            setTimeout(typeLine,350);
+        }
+    },30);
+}
+
+/* COUNTDOWN */
+let time = 15;
+function startCountdown(){
+    const cd = document.getElementById("countdown");
+    const interval = setInterval(()=>{
+        cd.textContent = "⚠ SYSTEM SELF-DESTRUCT IN: " + time + "s";
+        time--;
+        if(time < 0){
+            clearInterval(interval);
+            cd.textContent = "SELF-DESTRUCT ABORTED — LOVE OVERRIDE SUCCESSFUL ❤️";
+        }
+    },1000);
+}
+
+/* UNLOCK */
+function unlock(){
+    const val = document.getElementById("pass").value.toLowerCase();
+    if(val === PASSWORD){
+        document.getElementById("lock").classList.add("hidden");
+        document.getElementById("terminal").classList.remove("hidden");
+        document.getElementById("hackSound").play();
+        startCountdown();
+        typeLine();
+    } else {
+        document.getElementById("error").textContent = "ACCESS DENIED";
+    }
+}
+</script>
+
+</body>
+</html>
